@@ -20,7 +20,6 @@
 
         .admin-main { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
 
-        /* HEADER SECTION: Fixed Spacing & Alignment */
         .dashboard-header { 
             display: flex !important; 
             justify-content: space-between !important; 
@@ -44,7 +43,6 @@
             text-transform: uppercase;
         }
 
-        /* REFRESH BUTTON: Large & Professional */
         .btn-primary {
             padding: 16px 40px !important; 
             background: var(--primary-cyan) !important;
@@ -70,7 +68,6 @@
             background: #fff !important;
         }
 
-        /* STATS CARDS GRID */
         .analytics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -98,7 +95,6 @@
         .stat-card .val { font-size: 2.2rem; font-family: 'Orbitron'; font-weight: bold; display: block; margin: 5px 0; }
         .stat-card .lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
 
-        /* TABLE STYLING */
         .glass-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
@@ -113,7 +109,6 @@
         .analytics-table tr:hover { background: rgba(255, 255, 255, 0.08); }
         .analytics-table td { padding: 18px 15px; border-top: 1px solid var(--glass-border); vertical-align: middle; }
         
-        /* STATUS PILLS */
         .status-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; border: 1px solid; }
         .secure { background: rgba(0, 255, 136, 0.1); color: var(--success); border-color: var(--success); }
         .vulnerable { background: rgba(255, 77, 77, 0.1); color: var(--danger); border-color: var(--danger); }
@@ -124,6 +119,15 @@
     </style>
 </head>
 <body>
+    <div id="adminLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e14; z-index: 9999; display: flex; justify-content: center; align-items: center; font-family: 'Orbitron';">
+        <div class="glass-card" style="padding: 40px; text-align: center; border: 1px solid var(--primary-cyan); border-radius: 15px; width: 350px;">
+            <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--primary-cyan); margin-bottom: 20px;"></i>
+            <h2 style="color: white; margin-bottom: 20px; font-size: 1.2rem;">ADMIN ACCESS</h2>
+            <input type="password" id="adminPass" placeholder="Enter Admin Key" style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; border-radius: 8px; text-align: center; outline: none;">
+            <button onclick="checkAdmin()" style="width: 100%; padding: 12px; background: var(--primary-cyan); border: none; border-radius: 8px; color: #0b0e14; font-weight: bold; cursor: pointer;">UNLOCK DASHBOARD</button>
+            <p id="loginError" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 15px; display: none;">Invalid Access Key!</p>
+        </div>
+    </div>
 
     <nav class="top-nav">
         <div class="logo"><i class="fas fa-shield-alt"></i> CYBER<span>SHIELD</span> ADMIN</div>
@@ -154,15 +158,16 @@
                 <span class="lbl">Vulnerable / High Risk</span>
             </div>
         </div>
-<div style="margin: 20px 0; display: flex; justify-content: flex-end; gap: 15px; align-items: center;">
-    <span style="color: var(--text-muted); font-family: 'Orbitron'; font-size: 0.7rem;">FILTERS:</span>
-    
-    <div style="position: relative; width: 350px;">
-        <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: var(--primary-cyan); font-size: 0.9rem;"></i>
-        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Quick search agent..." 
-               style="padding: 12px 12px 12px 45px; width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: white; border-radius: 30px; font-family: 'Roboto'; outline: none; transition: 0.3s; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);">
-    </div>
-</div>
+
+        <div style="margin: 20px 0; display: flex; justify-content: flex-end; gap: 15px; align-items: center;">
+            <span style="color: var(--text-muted); font-family: 'Orbitron'; font-size: 0.7rem;">FILTERS:</span>
+            <div style="position: relative; width: 350px;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: var(--primary-cyan); font-size: 0.9rem;"></i>
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Quick search agent..." 
+                       style="padding: 12px 12px 12px 45px; width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: white; border-radius: 30px; font-family: 'Roboto'; outline: none; transition: 0.3s;">
+            </div>
+        </div>
+
         <div class="glass-card">
             <table class="analytics-table">
                 <thead>
@@ -174,8 +179,7 @@
                         <th style="text-align: center;">Action</th>
                     </tr>
                 </thead>
-                <tbody id="data-rows">
-                    </tbody>
+                <tbody id="data-rows"></tbody>
             </table>
         </div>
     </main>
@@ -197,6 +201,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Globalized functions to work with HTML buttons
         window.refreshData = function() {
             const dbRef = ref(db, 'leaderboard/');
             onValue(dbRef, (snapshot) => {
@@ -240,26 +245,7 @@
                 vulnerableCount.innerText = vulnerable;
             });
         };
-        // Search Filter Logic
-window.filterTable = function() {
-    let input = document.getElementById("searchInput");
-    let filter = input.value.toUpperCase();
-    let table = document.getElementById("data-rows");
-    let tr = table.getElementsByTagName("tr");
 
-    for (let i = 0; i < tr.length; i++) {
-        // First column (Employee Details) la irukkura name-ah check pannum
-        let td = tr[i].getElementsByTagName("td")[0]; 
-        if (td) {
-            let textValue = td.textContent || td.innerText;
-            if (textValue.toUpperCase().indexOf(filter) > -1) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
-        }
-    }
-};
         window.deleteRecord = function(recordId) {
             if(confirm(`Are you sure you want to purge this record from CyberShield database?`)) {
                 remove(ref(db, 'leaderboard/' + recordId));
@@ -267,6 +253,39 @@ window.filterTable = function() {
         };
 
         window.onload = window.refreshData;
+    </script>
+
+    <script>
+        // Non-module script for simple UI interactions
+        function checkAdmin() {
+            const passInput = document.getElementById('adminPass').value;
+            const errorMsg = document.getElementById('loginError');
+            if (passInput === "admin123") {
+                document.getElementById('adminLoginOverlay').style.display = "none";
+            } else {
+                errorMsg.style.display = "block";
+                document.getElementById('adminPass').value = "";
+            }
+        }
+
+        function filterTable() {
+            let input = document.getElementById("searchInput");
+            let filter = input.value.toUpperCase();
+            let table = document.getElementById("data-rows");
+            let tr = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName("td")[0]; 
+                if (td) {
+                    let textValue = td.textContent || td.innerText;
+                    if (textValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
     </script>
 </body>
 </html>

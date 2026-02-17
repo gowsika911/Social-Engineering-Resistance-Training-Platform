@@ -83,11 +83,25 @@
                 </button>
             </div>
         </section>
-          <div style="text-align: center; margin-top: 20px;">
-    <a href="admin.html" style="color: rgba(255,255,255,0.2); text-decoration: none; font-size: 0.7rem;">
-        <i class="fas fa-lock"></i> Admin Access
-    </a>
-</div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="javascript:void(0)" onclick="openAdminAuth()" style="color: rgba(255,255,255,0.2); text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron';">
+                <i class="fas fa-lock"></i> ADMIN ACCESS
+            </a>
+        </div>
+
+        <div id="adminAuthModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;">
+            <div class="glass-card" style="padding: 30px; text-align: center; width: 320px; border: 1px solid var(--primary-cyan);">
+                <i class="fas fa-user-shield" style="font-size: 2.5rem; color: var(--primary-cyan); margin-bottom: 15px;"></i>
+                <h3 style="color: white; font-family: 'Orbitron'; margin-bottom: 20px;">Admin Verification</h3>
+                <input type="password" id="adminKeyInput" placeholder="Enter Access Key" 
+                       style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; border-radius: 8px; text-align: center;">
+                <button onclick="verifyAdminKey()" class="btn btn-primary" style="width: 100%;">UNLOCK</button>
+                <p id="authErrorMsg" style="color: #ff4d4d; font-size: 0.8rem; margin-top: 15px; display: none;">Invalid Access Key!</p>
+                <button onclick="closeAdminAuth()" style="background: none; border: none; color: var(--text-muted); margin-top: 15px; cursor: pointer; font-size: 0.7rem;">Cancel</button>
+            </div>
+        </div>
+
     </main>
 
     <script type="module">
@@ -120,6 +134,36 @@
                 alert("Sync Error!");
             });
         }
+    </script>
+
+    <script>
+        function openAdminAuth() {
+            document.getElementById('adminAuthModal').style.display = 'flex';
+            document.getElementById('adminKeyInput').focus();
+        }
+
+        function closeAdminAuth() {
+            document.getElementById('adminAuthModal').style.display = 'none';
+            document.getElementById('authErrorMsg').style.display = 'none';
+        }
+
+        function verifyAdminKey() {
+            const key = document.getElementById('adminKeyInput').value;
+            // Neenga keta password 'admin123'
+            if (key === "admin123") {
+                window.location.href = "admin.html";
+            } else {
+                document.getElementById('authErrorMsg').style.display = 'block';
+                document.getElementById('adminKeyInput').value = "";
+            }
+        }
+
+        // Enter key press panna login aagura mari
+        document.getElementById('adminKeyInput')?.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                verifyAdminKey();
+            }
+        });
     </script>
 
     <script src="script.js"></script>
