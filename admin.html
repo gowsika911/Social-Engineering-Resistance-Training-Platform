@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield | Admin Analytics</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-cyan: #00ffff;
+            --success: #00ff88;
+            --danger: #ff4d4d;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-muted: #888;
+        }
+
+        .admin-main { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+
+        /* HEADER SECTION: Fixed Spacing & Alignment */
+        .dashboard-header { 
+            display: flex !important; 
+            justify-content: space-between !important; 
+            align-items: center; 
+            width: 100%;
+            margin-bottom: 40px; 
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            gap: 30px;
+        }
+
+        .dashboard-header h2 {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-cyan);
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* REFRESH BUTTON: Large & Professional */
+        .btn-primary {
+            padding: 16px 40px !important; 
+            background: var(--primary-cyan) !important;
+            color: #000 !important;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem !important;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            background: #fff !important;
+        }
+
+        /* STATS CARDS GRID */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-5px);
+        }
+
+        .stat-card i { font-size: 1.8rem; margin-bottom: 12px; display: block; }
+        .stat-card .val { font-size: 2.2rem; font-family: 'Orbitron'; font-weight: bold; display: block; margin: 5px 0; }
+        .stat-card .lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+
+        /* TABLE STYLING */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .analytics-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+        .analytics-table th { padding: 15px; text-align: left; color: var(--primary-cyan); font-family: 'Orbitron'; font-size: 0.85rem; text-transform: uppercase; }
+        .analytics-table tr { background: rgba(255, 255, 255, 0.03); transition: 0.2s; }
+        .analytics-table tr:hover { background: rgba(255, 255, 255, 0.08); }
+        .analytics-table td { padding: 18px 15px; border-top: 1px solid var(--glass-border); vertical-align: middle; }
+        
+        /* STATUS PILLS */
+        .status-pill { padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; border: 1px solid; }
+        .secure { background: rgba(0, 255, 136, 0.1); color: var(--success); border-color: var(--success); }
+        .vulnerable { background: rgba(255, 77, 77, 0.1); color: var(--danger); border-color: var(--danger); }
+
+        .top-nav { padding: 20px 40px; border-bottom: 1px solid var(--glass-border); }
+        .logo { font-family: 'Orbitron'; font-size: 1.5rem; color: #fff; }
+        .logo span { color: var(--primary-cyan); }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="logo"><i class="fas fa-shield-alt"></i> CYBER<span>SHIELD</span> ADMIN</div>
+    </nav>
+
+    <main class="admin-main">
+        <div class="dashboard-header">
+            <h2>Vulnerability Analytics</h2>
+            <button class="btn-primary" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> Refresh Live Data
+            </button>
+        </div>
+
+        <div class="analytics-grid">
+            <div class="stat-card" style="border-top: 4px solid var(--primary-cyan);">
+                <i class="fas fa-users" style="color: var(--primary-cyan);"></i>
+                <span id="user-count" class="val">0</span>
+                <span class="lbl">Total Tested</span>
+            </div>
+            <div class="stat-card" style="border-top: 4px solid var(--success);">
+                <i class="fas fa-user-check" style="color: var(--success);"></i>
+                <span id="safe-count" class="val" style="color: var(--success);">0</span>
+                <span class="lbl">Safe / Low Risk</span>
+            </div>
+            <div class="stat-card" style="border-top: 4px solid var(--danger);">
+                <i class="fas fa-user-slash" style="color: var(--danger);"></i>
+                <span id="vulnerable-count" class="val" style="color: var(--danger);">0</span>
+                <span class="lbl">Vulnerable / High Risk</span>
+            </div>
+        </div>
+<div style="margin: 20px 0; display: flex; justify-content: flex-end; gap: 15px; align-items: center;">
+    <span style="color: var(--text-muted); font-family: 'Orbitron'; font-size: 0.7rem;">FILTERS:</span>
+    
+    <div style="position: relative; width: 350px;">
+        <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: var(--primary-cyan); font-size: 0.9rem;"></i>
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Quick search agent..." 
+               style="padding: 12px 12px 12px 45px; width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: white; border-radius: 30px; font-family: 'Roboto'; outline: none; transition: 0.3s; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);">
+    </div>
+</div>
+        <div class="glass-card">
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th>Employee Details</th>
+                        <th>Security Score</th>
+                        <th>Risk Assessment</th>
+                        <th>Last Activity</th>
+                        <th style="text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="data-rows">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72LBVCff3yksHJKEK8NW66_9jxjarIqs",
+            authDomain: "cybershield-ea986.firebaseapp.com",
+            projectId: "cybershield-ea986",
+            storageBucket: "cybershield-ea986.firebasestorage.app",
+            messagingSenderId: "414653602638",
+            appId: "1:414653602638:web:b660b21916e62c574f5c1f",
+            databaseURL: "https://cybershield-ea986-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.refreshData = function() {
+            const dbRef = ref(db, 'leaderboard/');
+            onValue(dbRef, (snapshot) => {
+                const tableBody = document.getElementById('data-rows');
+                const userCount = document.getElementById('user-count');
+                const safeCount = document.getElementById('safe-count');
+                const vulnerableCount = document.getElementById('vulnerable-count');
+                
+                tableBody.innerHTML = ""; 
+                let total = 0, safe = 0, vulnerable = 0;
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        total++;
+                        const isSafe = data.score >= 20;
+                        isSafe ? safe++ : vulnerable++;
+
+                        const statusClass = isSafe ? 'secure' : 'vulnerable';
+                        const statusText = isSafe ? 'Low Risk' : 'High Risk';
+
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td><i class="fas fa-user-circle" style="color:var(--primary-cyan)"></i> <b>${data.employeeName}</b></td>
+                                <td><span style="font-family:Orbitron; font-weight:bold">${data.score}</span> <small>/ 30</small></td>
+                                <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+                                <td style="color: #aaa; font-size: 0.85rem;">${data.timestamp}</td>
+                                <td style="text-align: center;">
+                                    <button onclick="deleteRecord('${childSnapshot.key}')" 
+                                            style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.1rem; transition: 0.3s">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>`;
+                    });
+                } else {
+                    tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 40px; color:#666;'>SYSTEM READY: Awaiting Simulation Data...</td></tr>";
+                }
+                userCount.innerText = total;
+                safeCount.innerText = safe;
+                vulnerableCount.innerText = vulnerable;
+            });
+        };
+        // Search Filter Logic
+window.filterTable = function() {
+    let input = document.getElementById("searchInput");
+    let filter = input.value.toUpperCase();
+    let table = document.getElementById("data-rows");
+    let tr = table.getElementsByTagName("tr");
+
+    for (let i = 0; i < tr.length; i++) {
+        // First column (Employee Details) la irukkura name-ah check pannum
+        let td = tr[i].getElementsByTagName("td")[0]; 
+        if (td) {
+            let textValue = td.textContent || td.innerText;
+            if (textValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+};
+        window.deleteRecord = function(recordId) {
+            if(confirm(`Are you sure you want to purge this record from CyberShield database?`)) {
+                remove(ref(db, 'leaderboard/' + recordId));
+            }
+        };
+
+        window.onload = window.refreshData;
+    </script>
+</body>
+</html>

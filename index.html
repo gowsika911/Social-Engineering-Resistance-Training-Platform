@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield | Security Awareness Platform</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="top-nav">
+        <div class="logo">
+            <i class="fas fa-user-shield"></i> CYBER<span>SHIELD</span>
+        </div>
+        <div class="stats-container">
+            <div class="stat-badge">
+                <span class="label">SCORE</span>
+                <span id="score" class="value">0</span>
+            </div>
+            <div class="stat-badge">
+                <span class="label">TIMER</span>
+                <span id="timer" class="value">15</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <section id="login-screen" class="glass-card" style="text-align: center;">
+            <i class="fas fa-id-card-alt" style="font-size: 3.5rem; color: var(--primary-cyan); margin-bottom: 20px;"></i>
+            <h2 style="font-family: 'Orbitron'; margin-bottom: 20px;">EMPLOYEE LOGIN</h2>
+            
+            <div class="input-group" style="margin-bottom: 15px;">
+                <input type="text" id="login-name" placeholder="Enter Full Name" autocomplete="off"
+                       style="width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: white;">
+            </div>
+            <div class="input-group" style="margin-bottom: 25px;">
+                <input type="text" id="employee-id" placeholder="Employee ID (e.g., EMP123)" autocomplete="off"
+                       style="width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: white;">
+            </div>
+
+            <button class="btn btn-primary" onclick="handleSignIn()" style="width: 100%;">
+                <i class="fas fa-sign-in-alt"></i> INITIALIZE MISSION
+            </button>
+        </section>
+
+        <section id="game-box" class="hidden">
+            <div class="progress-wrapper">
+                <div id="progress-bar"></div>
+            </div>
+
+            <div class="glass-card">
+                <div class="card-header">
+                    <span class="badge">LIVE SCENARIO</span>
+                    <h2 id="scenario-title">Authenticating...</h2>
+                </div>
+                
+                <div class="scenario-content" id="scenario-body"></div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="handleChoice('safe')">
+                        <i class="fas fa-check-circle"></i> TRUST
+                    </button>
+                    <button class="btn btn-primary" onclick="handleChoice('scam')">
+                        <i class="fas fa-flag"></i> REPORT
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="result-screen" class="hidden">
+            <div class="glass-card result-card" style="text-align: center;">
+                <i class="fas fa-trophy trophy-icon"></i>
+                <h2>Mission Accomplished</h2>
+                <p style="font-size: 1.2rem; margin: 15px 0;">Final Awareness Rating: <span id="final-score" style="color: var(--primary-cyan); font-weight: bold;">0</span>/30</p>
+                <div id="user-display" style="color: var(--text-muted); margin-bottom: 25px; font-family: 'Orbitron'; font-size: 0.8rem;"></div>
+                
+                <button class="btn btn-save" onclick="syncFinalData()" style="width: 100%; background: var(--neon-purple);">
+                    <i class="fas fa-cloud-upload-alt"></i> SYNC TO CLOUD
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA72LBVCff3yksHJKEK8NW66_9jxjarIqs",
+            authDomain: "cybershield-ea986.firebaseapp.com",
+            projectId: "cybershield-ea986",
+            storageBucket: "cybershield-ea986.firebasestorage.app",
+            messagingSenderId: "414653602638",
+            appId: "1:414653602638:web:b660b21916e62c574f5c1f",
+            databaseURL: "https://cybershield-ea986-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.saveToFirebase = function(name, score) {
+            const userRef = ref(db, 'leaderboard/' + name);
+            set(userRef, {
+                employeeName: name,
+                score: score,
+                timestamp: new Date().toLocaleString()
+            }).then(() => {
+                alert("Cloud Sync Successful!");
+                window.location.reload(); 
+            }).catch((err) => {
+                alert("Sync Error!");
+            });
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+</html>
